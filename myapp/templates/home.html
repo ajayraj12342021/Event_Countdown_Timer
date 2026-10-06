@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Countdown Timer</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+    <h1>Welcome to the Event Countdown Timer</h1>
+
+    <a href="{% url 'add_event' %}">Add Event</a>
+
+    <hr>
+
+    {% for event in events %}
+
+        <h2>{{ event.Event_name }}</h2>
+
+        <p>Date: {{ event.date }}</p>
+
+        <p>Time: {{ event.time }}</p>
+
+        <h3>
+            Countdown:
+            <span id="countdown-{{ event.id }}">Loading...</span>
+        </h3>
+
+        <script>
+
+            var countdownDate{{ event.id }} = new Date(
+                "{{ event.date|date:'Y-m-d' }}T{{ event.time|time:'H:i:s' }}"
+            ).getTime();
+
+            var x{{ event.id }} = setInterval(function() {
+
+                var now = new Date().getTime();
+
+                var distance = countdownDate{{ event.id }} - now;
+
+                var days = Math.floor(
+                    distance / (1000 * 60 * 60 * 24)
+                );
+
+                var hours = Math.floor(
+                    (distance % (1000 * 60 * 60 * 24))
+                    / (1000 * 60 * 60)
+                );
+
+                var minutes = Math.floor(
+                    (distance % (1000 * 60 * 60))
+                    / (1000 * 60)
+                );
+
+                var seconds = Math.floor(
+                    (distance % (1000 * 60))
+                    / 1000
+                );
+
+                document.getElementById(
+                    "countdown-{{ event.id }}"
+                ).innerHTML =
+                    days + "d " +
+                    hours + "h " +
+                    minutes + "m " +
+                    seconds + "s";
+
+                if (distance < 0) {
+
+                    clearInterval(x{{ event.id }});
+
+                    document.getElementById(
+                        "countdown-{{ event.id }}"
+                    ).innerHTML = "EXPIRED";
+                }
+
+            }, 1000);
+
+        </script>
+
+        <hr>
+
+    {% empty %}
+
+        <p>No events found.</p>
+
+    {% endfor %}
+
+</body>
+</html>
